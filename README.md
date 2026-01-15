@@ -15,7 +15,9 @@ During development you can store secrets in a local `.env` file and run the prov
 | `MEMORYBANK_API_KEY` | yes | Workspace API key used for the Authorization header. |
 | `MEMORYBANK_PROJECT_ID` | no | Project/workspace identifier passed as the `projectId` query parameter. Provide it when the API key is scoped to a project. |
 | `MEMORYBANK_TIMEOUT_MS` | no | Override request timeout in milliseconds (default `15000`). |
+| `MEMORYBANK_CACHE_TTL_MS` | no | Cache lifetime for fetched rules (default `600000`, set to `0` to disable caching). |
 | `MEMORYBANK_USER_AGENT` | no | Custom User-Agent header (defaults to `memorybank-mcp/<package version>`). |
+| `DEBUG_MEMORYBANK_MCP` | no | Set to `true` to log raw backend responses when JSON parsing fails (useful for debugging only). |
 
 ## Scripts
 - `npm run build` – compile TypeScript into `dist/`.
@@ -24,8 +26,11 @@ During development you can store secrets in a local `.env` file and run the prov
 - `npm run watch` – run the TypeScript compiler in watch mode (`tsc -w`) to keep `dist/` updated without launching the server.
 - `npm run debug` – start the debug client to call the `memorybank_get_rules` tool via stdio.
 
+The MCP server instructs agents to call `memorybank_get_rules` exactly once at the start of a session. The tool caches the Markdown response for `MEMORYBANK_CACHE_TTL_MS` milliseconds and accepts an optional `{ "force": true }` argument to bypass the cache.
+
 ## Resources
-- `memorybank://context/active_context` – exposes the current MemoryBank ruleset as Markdown (identical to the `memorybank_get_rules` tool output). MCP clients that prefer reading resources can fetch this URI directly.
+- `memorybank://context/active_context` – exposes the cached MemoryBank ruleset as Markdown (identical to the `memorybank_get_rules` tool output).
+- `memorybank://rules` – alias resource that returns the same Markdown document.
 
 ## Development workflow
 ```bash
