@@ -4,7 +4,8 @@ import { createRequire } from 'module';
 const nodeRequire = createRequire(import.meta.url);
 const packageJson = nodeRequire('../package.json');
 
-export const DEFAULT_TIMEOUT_MS = 15000;
+export const DEFAULT_TIMEOUT_MS = 15_000;
+export const DEFAULT_CACHE_TTL_MS = 600_000; // 10 minutes
 const DEFAULT_USER_AGENT = `memorybank-mcp/${packageJson.version ?? '0.0.0'}`;
 
 const envSchema = z.object({
@@ -12,6 +13,7 @@ const envSchema = z.object({
   MEMORYBANK_API_KEY: z.string().min(1, 'MEMORYBANK_API_KEY is required'),
   MEMORYBANK_PROJECT_ID: z.string().min(1).optional(),
   MEMORYBANK_TIMEOUT_MS: z.string().optional(),
+  MEMORYBANK_CACHE_TTL_MS: z.string().optional(),
   MEMORYBANK_USER_AGENT: z.string().optional()
 });
 
@@ -20,6 +22,7 @@ export interface MemoryBankConfig {
   apiKey: string;
   projectId?: string;
   timeoutMs: number;
+  cacheTtlMs: number;
   userAgent: string;
   version: string;
 }
@@ -43,11 +46,18 @@ export const loadConfig = (env: NodeJS.ProcessEnv = process.env): MemoryBankConf
     throw new Error('MEMORYBANK_TIMEOUT_MS must be a positive number in milliseconds');
   }
 
+  const cacheTtlEnv = result.data.MEMORYBANK_CACHE_TTL_MS;
+  const cacheTtlMs = cacheTtlEnv ? Number(cacheTtlEnv) : DEFAULT_CACHE_TTL_MS;
+  if (!Number.isFinite(cacheTtlMs) || cacheTtlMs < 0) {
+    throw new Error('MEMORYBANK_CACHE_TTL_MS must be a non-negative number in milliseconds');
+  }
+
   return {
     baseUrl: result.data.MEMORYBANK_BASE_URL.replace(/\/$/, ''),
     apiKey: result.data.MEMORYBANK_API_KEY,
     projectId: result.data.MEMORYBANK_PROJECT_ID,
     timeoutMs,
+    cacheTtlMs,
     userAgent: result.data.MEMORYBANK_USER_AGENT ?? DEFAULT_USER_AGENT,
     version: typeof packageJson.version === 'string' ? packageJson.version : '0.0.0'
   };

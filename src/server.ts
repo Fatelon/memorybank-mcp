@@ -1,11 +1,13 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { MemoryBankConfig } from './config.js';
 import { MemoryBankBackendClient } from './backendClient.js';
+import { RulesCache } from './rulesCache.js';
 import { registerRulesTool } from './tools/rules.js';
 import { registerActiveContextResource } from './resources/activeContext.js';
+import { registerRulesResource } from './resources/rules.js';
 
 const SERVER_INSTRUCTIONS =
-  'This MCP server exposes the user’s MemoryBank rules. Call memorybank_get_rules once before starting work so the full rule set is in context.';
+  'At the start of each new chat/session, call memorybank_get_rules exactly once before any planning or code. Cache the result for the current session; do not call again unless a refresh is needed.';
 
 export const createMemoryBankServer = (config: MemoryBankConfig): McpServer => {
   const server = new McpServer(
@@ -17,8 +19,11 @@ export const createMemoryBankServer = (config: MemoryBankConfig): McpServer => {
   );
 
   const backendClient = new MemoryBankBackendClient(config);
-  registerRulesTool(server, backendClient);
-  registerActiveContextResource(server, backendClient);
+  const rulesCache = new RulesCache(backendClient, config);
+
+  registerRulesTool(server, rulesCache);
+  registerActiveContextResource(server, rulesCache);
+  registerRulesResource(server, rulesCache);
 
   return server;
 };

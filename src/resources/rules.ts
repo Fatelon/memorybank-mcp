@@ -3,19 +3,20 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { MemoryBankBackendError } from '../backendClient.js';
 import type { RulesCache } from '../rulesCache.js';
 
-const RESOURCE_URI = 'memorybank://context/active_context';
+const RESOURCE_URI = 'memorybank://rules';
 
-export const registerActiveContextResource = (server: McpServer, rulesCache: RulesCache): void => {
+export const registerRulesResource = (server: McpServer, rulesCache: RulesCache): void => {
   server.registerResource(
-    'memorybank_active_context',
+    'memorybank_rules',
     RESOURCE_URI,
     {
-      description: 'Latest MemoryBank rules for this workspace.',
+      description: 'MemoryBank rules document for this project.',
       mimeType: 'text/markdown'
     },
     async () => {
       try {
         const rulesText = await rulesCache.getRules();
+
         return {
           contents: [
             {

@@ -32,7 +32,7 @@ export class MemoryBankTimeoutError extends MemoryBankBackendError {
 export class MemoryBankBackendClient {
   constructor(private readonly config: MemoryBankConfig, private readonly fetchImpl: typeof fetch = fetch) {}
 
-  async fetchRulesText(): Promise<string> {
+  async fetchRules(): Promise<string> {
     const url = new URL(RULES_ENDPOINT_PATH, this.config.baseUrl);
     if (this.config.projectId) {
       url.searchParams.set('projectId', this.config.projectId);
