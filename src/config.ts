@@ -1,5 +1,8 @@
 import { z } from 'zod';
 import { createRequire } from 'module';
+import dotenv from 'dotenv';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 
 const nodeRequire = createRequire(import.meta.url);
 const packageJson = nodeRequire('../package.json');
@@ -35,7 +38,17 @@ const formatZodError = (error: z.ZodError) =>
     .join('; ');
 
 export const loadConfig = (env: NodeJS.ProcessEnv = process.env): MemoryBankConfig => {
-  const result = envSchema.safeParse(env);
+  // Load .env file from current working directory with priority over process.env
+  const envPath = resolve(process.cwd(), '.env');
+  const dotenvResult = existsSync(envPath) ? dotenv.config({ path: envPath }) : { parsed: {} };
+
+  // Merge with priority: .env file > process.env (MCP config)
+  const mergedEnv = {
+    ...env,
+    ...(dotenvResult.parsed || {})
+  };
+
+  const result = envSchema.safeParse(mergedEnv);
   if (!result.success) {
     throw new Error(`Invalid MemoryBank MCP configuration: ${formatZodError(result.error)}`);
   }
