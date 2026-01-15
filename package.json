@@ -1,5 +1,5 @@
 {
-  "name": "memorybank-mcp",
+  "name": "@morsa/memorybank-mcp",
   "version": "1.0.0",
   "description": "MemoryBank MCP server that proxies the MemoryBank rules endpoint for agents",
   "type": "module",

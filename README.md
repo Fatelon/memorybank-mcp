@@ -47,6 +47,8 @@ npm run debug
 ## Cursor configuration
 Add the server to `~/.cursor/mcp.json` (or workspace `mcp.json`) under the `mcpServers` key.
 
+### Option 1: Environment variables in mcp.json
+
 Using `npx`:
 
 ```json
@@ -54,7 +56,7 @@ Using `npx`:
   "mcpServers": {
     "memorybank-mcp": {
       "command": "npx",
-      "args": ["--yes", "memorybank-mcp"],
+      "args": ["--yes", "@morsa/memorybank-mcp"],
       "env": {
         "MEMORYBANK_BASE_URL": "https://example.com",
         "MEMORYBANK_API_KEY": "mbk_...",
@@ -78,6 +80,29 @@ Using a locally built binary:
         "MEMORYBANK_API_KEY": "mbk_...",
         "MEMORYBANK_PROJECT_ID": "proj_123"
       }
+    }
+  }
+}
+```
+
+### Option 2: Using .env file
+
+Create a `.env` file in your project root or the directory where Cursor runs:
+
+```
+MEMORYBANK_BASE_URL=https://example.com
+MEMORYBANK_API_KEY=mbk_...
+MEMORYBANK_PROJECT_ID=proj_123
+```
+
+Then configure mcp.json without `env` variables:
+
+```json
+{
+  "mcpServers": {
+    "memorybank-mcp": {
+      "command": "npx",
+      "args": ["--yes", "@morsa/memorybank-mcp"]
     }
   }
 }
