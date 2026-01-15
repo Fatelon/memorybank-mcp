@@ -1,6 +1,6 @@
 {
   "name": "@morsa/memorybank-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MemoryBank MCP server that proxies the MemoryBank rules endpoint for agents",
   "type": "module",
   "main": "dist/index.js",
@@ -23,7 +23,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build && chmod +x dist/index.js"
   },
   "repository": {
     "type": "git",
